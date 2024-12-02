@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"log"
-
+	"fmt"
 	m "go-fiber-test/models"
+	"log"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -33,6 +33,24 @@ func BodyTest(c *fiber.Ctx) error {
 func ParamsTest(c *fiber.Ctx) error {
 	name := c.Params("name")
 	return c.SendString("Hello " + name)
+}
+
+func Fact(c *fiber.Ctx) error {
+	num, err := c.ParamsInt("num")
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid input. Please provide a non-negative integer.")
+	}
+
+	if num < 0 {
+		return c.Status(fiber.StatusBadRequest).SendString("Factorial is not defined for negative numbers.")
+	}
+
+	result := 1
+	for i := 1; i <= num; i++ {
+		result *= i
+	}
+
+	return c.SendString(fmt.Sprintf("%d! = %d", num, result))
 }
 
 func QueryTest(c *fiber.Ctx) error {

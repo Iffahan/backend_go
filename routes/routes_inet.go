@@ -11,8 +11,7 @@ func InetRoutes(app *fiber.App) {
 	// Provide a minimal config
 	app.Use(basicauth.New(basicauth.Config{
 		Users: map[string]string{
-			"john":  "doe",
-			"admin": "123456",
+			"gofiber": "21022566",
 		},
 	}))
 
@@ -26,6 +25,7 @@ func InetRoutes(app *fiber.App) {
 	v1.Post("/", controllers.BodyTest)
 
 	v1.Get("/:name", controllers.ParamsTest)
+	v1.Get("fact/:num", controllers.Fact)
 
 	v1.Post("/inet", controllers.QueryTest)
 
