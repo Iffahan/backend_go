@@ -31,6 +31,7 @@ func InetRoutes(app *fiber.App) {
 	dog.Delete("/:id", c.RemoveDog)
 	dog.Get("/deleted", c.GetDeletedDogs)
 	dog.Get("/half", c.GetDogHalf)
+	dog.Get("/sum", c.GetDogsSum)
 
 	//CRUD companys
 	company := v1.Group("/company")

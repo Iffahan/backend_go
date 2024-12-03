@@ -46,6 +46,16 @@ type ResultData struct {
 	Count int       `json:"count"`
 }
 
+type ResultColor struct {
+	Data        []DogsRes `json:"data"`
+	Name        string    `json:"name"`
+	Count       int       `json:"count"`
+	Sum_Red     int       `json:"sum_red"`
+	Sum_Green   int       `json:"sum_green"`
+	Sum_Pink    int       `json:"sum_pink"`
+	Sum_NoColor int       `json:"sum_nocolor"`
+}
+
 type Company struct {
 	gorm.Model
 	Name     string `json:"name"`
