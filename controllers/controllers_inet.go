@@ -7,6 +7,7 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -357,17 +358,69 @@ func RemoveCompany(c *fiber.Ctx) error {
 	return c.SendStatus(200)
 }
 
-/////////////////////CRUD Profile//////////////////////////////////
+// ///////////////////CRUD Profile//////////////////////////////////
+func calculateAge(birthday string) (int, error) {
+	birthDate, err := time.Parse("2006-01-02", birthday)
+	if err != nil {
+		return 0, err
+	}
+
+	currentDate := time.Now()
+
+	age := currentDate.Year() - birthDate.Year()
+	if currentDate.YearDay() < birthDate.YearDay() {
+		age--
+	}
+
+	return age, nil
+}
 
 func AddProfile(c *fiber.Ctx) error {
 	db := database.DBConn
 	var profile m.Profile
+
 	if err := c.BodyParser(&profile); err != nil {
-		return c.Status(503).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid input data",
+			"error":   err.Error(),
+		})
 	}
 
-	db.Create(&profile)
-	return c.Status(201).JSON(profile)
+	var existingProfile m.Profile
+	if err := db.Where("employee_id = ?", profile.EmployeeID).First(&existingProfile).Error; err == nil {
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+			"message": "Employee ID already exists",
+			"error":   fmt.Sprintf("Employee ID %d already exists", profile.EmployeeID),
+		})
+	}
+
+	calculatedAge, err := calculateAge(profile.Birthday)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid birthday format",
+			"error":   err.Error(),
+		})
+	}
+
+	if profile.Age != 0 && profile.Age != calculatedAge {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Age does not match the provided birthday",
+			"error":   fmt.Sprintf("Provided age: %d, calculated age: %d", profile.Age, calculatedAge),
+		})
+	}
+
+	if profile.Age == 0 {
+		profile.Age = calculatedAge
+	}
+
+	if err := db.Create(&profile).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Could not save profile to database",
+			"error":   err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(profile)
 }
 
 func GetProfiles(c *fiber.Ctx) error {

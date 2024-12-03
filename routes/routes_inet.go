@@ -8,7 +8,6 @@ import (
 )
 
 func InetRoutes(app *fiber.App) {
-	app.Get("/", mw.BasicAuth(), c.HelloTest)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
