@@ -162,6 +162,19 @@ func GetDog(c *fiber.Ctx) error {
 	return c.Status(200).JSON(&dog)
 }
 
+func GetDogHalf(c *fiber.Ctx) error {
+	db := database.DBConn
+	var dog []m.Dogs
+
+	result := db.Find(&dog, "dog_id > ? && dog_id < ?", 50, 100)
+
+	// returns found records count, equals `len(users)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.Status(200).JSON(&dog)
+}
+
 func AddDog(c *fiber.Ctx) error {
 	//twst3
 	db := database.DBConn

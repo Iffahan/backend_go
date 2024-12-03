@@ -30,6 +30,7 @@ func InetRoutes(app *fiber.App) {
 	dog.Put("/:id", c.UpdateDog)
 	dog.Delete("/:id", c.RemoveDog)
 	dog.Get("/deleted", c.GetDeletedDogs)
+	dog.Get("/half", c.GetDogHalf)
 
 	//v1
 	v1.Get("/:name", c.ParamsTest)
