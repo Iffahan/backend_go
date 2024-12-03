@@ -45,3 +45,13 @@ type ResultData struct {
 	Name  string    `json:"name"`
 	Count int       `json:"count"`
 }
+
+type Company struct {
+	gorm.Model
+	Name     string `json:"name"`
+	Addresss string `json:"address"`
+	Phone    string `json:"phone"`
+	Email    string `json:"email"`
+	TaxID    string `json:"tax_id"`
+	Website  string `json:"website"`
+}

@@ -69,17 +69,17 @@ func TaxID(c *fiber.Ctx) error {
 		asciiValues = append(asciiValues, fmt.Sprintf("%d", int(v)))
 	}
 
-	// Join the ASCII values into a single string
 	asciiString := strings.Join(asciiValues, " ")
 
-	// Construct the response string
 	response := fmt.Sprintf("tax_id = %s : %s", tax, asciiString)
 
-	return c.SendString(response) // Return plain text response
+	return c.SendString(response)
 }
 
-func ValidTest(c *fiber.Ctx) error {
+func Register(c *fiber.Ctx) error {
+	db := database.DBConn
 	user := new(m.User)
+
 	if err := c.BodyParser(user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid input data",
@@ -100,7 +100,7 @@ func ValidTest(c *fiber.Ctx) error {
 	})
 
 	validate.RegisterValidation("email", func(fl validator.FieldLevel) bool {
-		matched, _ := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, fl.Field().String())
+		matched, _ := regexp.MatchString(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+/.[a-zA-Z]{2,}$`, fl.Field().String())
 		return matched
 	})
 
@@ -110,7 +110,7 @@ func ValidTest(c *fiber.Ctx) error {
 	})
 
 	validate.RegisterValidation("website", func(fl validator.FieldLevel) bool {
-		matched, _ := regexp.MatchString(`^(https?://)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`, fl.Field().String())
+		matched, _ := regexp.MatchString(`^(https?://)?[a-z0-9.-]+\.[a-z]{2,}$`, fl.Field().String())
 		return matched
 	})
 
@@ -128,8 +128,11 @@ func ValidTest(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(user)
+	db.Create(&user)
+	return c.Status(201).JSON(user)
 }
+
+/////////////////////CRUD Dog//////////////////////////////////
 
 func GetDogs(c *fiber.Ctx) error {
 	db := database.DBConn
@@ -249,4 +252,52 @@ func GetDogsJson(c *fiber.Ctx) error {
 		Count: len(dogs), //หาผลรวม,
 	}
 	return c.Status(200).JSON(r)
+}
+
+// ///////////////////CRUD Company//////////////////////////////////
+func AddCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	var company m.Company
+
+	if err := c.BodyParser(&company); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	db.Create(&company)
+	return c.Status(201).JSON(company)
+}
+
+func GetCompanys(c *fiber.Ctx) error {
+	db := database.DBConn
+	var companys []m.Company
+
+	db.Find(&companys) //delelete = null
+	return c.Status(200).JSON(companys)
+}
+
+func UpdateCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	var company m.Company
+	id := c.Params("id")
+
+	if err := c.BodyParser(&company); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	db.Where("id = ?", id).Updates(&company)
+	return c.Status(200).JSON(company)
+}
+
+func RemoveCompany(c *fiber.Ctx) error {
+	db := database.DBConn
+	id := c.Params("id")
+	var company m.Company
+
+	result := db.Delete(&company, id)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+
+	return c.SendStatus(200)
 }

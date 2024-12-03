@@ -32,13 +32,20 @@ func InetRoutes(app *fiber.App) {
 	dog.Get("/deleted", c.GetDeletedDogs)
 	dog.Get("/half", c.GetDogHalf)
 
+	//CRUD companys
+	company := v1.Group("/company")
+	company.Get("", c.GetCompanys)
+	company.Post("/", c.AddCompany)
+	company.Put("/:id", c.UpdateCompany)
+	company.Delete("/:id", c.RemoveCompany)
+
 	//v1
 	v1.Get("/:name", c.ParamsTest)
 	v1.Get("fact/:num", c.Fact)
 	v1.Get("/", c.HelloTest)
 	v1.Post("/", c.BodyTest)
 	v1.Post("/inet", c.QueryTest)
-	v1.Post("/register", c.ValidTest)
+	v1.Post("/register", c.Register)
 
 	//v2
 	v2.Get("/", c.HelloTestV2)
