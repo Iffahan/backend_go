@@ -2,18 +2,13 @@ package routes
 
 import (
 	c "go-fiber-test/controllers"
+	mw "go-fiber-test/middlewares"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/basicauth"
 )
 
 func InetRoutes(app *fiber.App) {
-	// Provide a minimal config
-	app.Use(basicauth.New(basicauth.Config{
-		Users: map[string]string{
-			"gofiber": "21022566",
-		},
-	}))
+	app.Get("/", mw.BasicAuth(), c.HelloTest)
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -23,35 +18,42 @@ func InetRoutes(app *fiber.App) {
 
 	//CRUD dogs
 	dog := v1.Group("/dog")
-	dog.Get("", c.GetDogs)
-	dog.Get("/filter", c.GetDog)
-	dog.Get("/json", c.GetDogsJson)
-	dog.Post("/", c.AddDog)
-	dog.Put("/:id", c.UpdateDog)
-	dog.Delete("/:id", c.RemoveDog)
-	dog.Get("/deleted", c.GetDeletedDogs)
-	dog.Get("/half", c.GetDogHalf)
-	dog.Get("/sum", c.GetDogsSum)
+	dog.Get("", mw.BasicAuth(), c.GetDogs)
+	dog.Get("/filter", mw.BasicAuth(), c.GetDog)
+	dog.Get("/json", mw.BasicAuth(), c.GetDogsJson)
+	dog.Post("/", mw.BasicAuth(), c.AddDog)
+	dog.Put("/:id", mw.BasicAuth(), c.UpdateDog)
+	dog.Delete("/:id", mw.BasicAuth(), c.RemoveDog)
+	dog.Get("/deleted", mw.BasicAuth(), c.GetDeletedDogs)
+	dog.Get("/half", mw.BasicAuth(), c.GetDogHalf)
+	dog.Get("/sum", mw.BasicAuth(), c.GetDogsSum)
 
 	//CRUD companys
 	company := v1.Group("/company")
-	company.Get("", c.GetCompanys)
-	company.Post("/", c.AddCompany)
-	company.Put("/:id", c.UpdateCompany)
-	company.Delete("/:id", c.RemoveCompany)
+	company.Get("", mw.BasicAuth(), c.GetCompanys)
+	company.Post("/", mw.BasicAuth(), c.AddCompany)
+	company.Put("/:id", mw.BasicAuth(), c.UpdateCompany)
+	company.Delete("/:id", mw.BasicAuth(), c.RemoveCompany)
+
+	//CRUD profile
+	profile := v1.Group("/profile")
+	profile.Get("", c.GetProfiles)
+	profile.Post("/", mw.BasicAuth(), c.AddProfile)
+	profile.Put("/:id", mw.BasicAuth(), c.UpdateProfile)
+	profile.Delete("/:id", mw.BasicAuth(), c.RemoveProfile)
 
 	//v1
-	v1.Get("/:name", c.ParamsTest)
-	v1.Get("fact/:num", c.Fact)
-	v1.Get("/", c.HelloTest)
-	v1.Post("/", c.BodyTest)
-	v1.Post("/inet", c.QueryTest)
-	v1.Post("/register", c.Register)
+	v1.Get("/:name", mw.BasicAuth(), c.ParamsTest)
+	v1.Get("fact/:num", mw.BasicAuth(), c.Fact)
+	v1.Get("/", mw.BasicAuth(), c.HelloTest)
+	v1.Post("/", mw.BasicAuth(), c.BodyTest)
+	v1.Post("/inet", mw.BasicAuth(), c.QueryTest)
+	v1.Post("/register", mw.BasicAuth(), c.Register)
 
 	//v2
-	v2.Get("/", c.HelloTestV2)
+	v2.Get("/", mw.BasicAuth(), c.HelloTestV2)
 
 	//nickname
-	iF.Get("/", c.TaxID)
+	iF.Get("/", mw.BasicAuth(), c.TaxID)
 
 }

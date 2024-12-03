@@ -65,3 +65,14 @@ type Company struct {
 	TaxID    string `json:"tax_id"`
 	Website  string `json:"website"`
 }
+
+type Profile struct {
+	gorm.Model
+	EmployeeID int       `json:"employee_id,omitempty" validate:"required" gorm:"unique"`
+	FirstName  string    `json:"first_name,omitempty" validate:"required,min=3,max=32"`
+	LastName   string    `json:"last_name,omitempty" validate:"required,min=3,max=32"`
+	Birthday   time.Time `json:"birthday,omitempty" validate:"required" gorm:"type:date"`
+	Age        int       `json:"age,omitempty" validate:"required,min=12,max=100"`
+	Email      string    `json:"email,omitempty" validate:"required,email"`
+	Tel        string    `json:"tel,omitempty" validate:"required,min=10,max=13"`
+}

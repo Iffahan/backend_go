@@ -30,6 +30,7 @@ func initDatabase() {
 	db.DBConn.AutoMigrate(&m.Dogs{})
 	db.DBConn.AutoMigrate(&m.User{})
 	db.DBConn.AutoMigrate(&m.Company{})
+	db.DBConn.AutoMigrate(&m.Profile{})
 
 }
 

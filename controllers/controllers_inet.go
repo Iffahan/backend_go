@@ -302,9 +302,17 @@ func GetDogsSum(c *fiber.Ctx) error {
 }
 
 // ///////////////////CRUD Company//////////////////////////////////
+
 func AddCompany(c *fiber.Ctx) error {
 	db := database.DBConn
 	var company m.Company
+
+	if err := c.BodyParser(company); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid input data",
+			"error":   err.Error(),
+		})
+	}
 
 	if err := c.BodyParser(&company); err != nil {
 		return c.Status(503).SendString(err.Error())
@@ -346,5 +354,47 @@ func RemoveCompany(c *fiber.Ctx) error {
 		return c.SendStatus(404)
 	}
 
+	return c.SendStatus(200)
+}
+
+/////////////////////CRUD Profile//////////////////////////////////
+
+func AddProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	var profile m.Profile
+	if err := c.BodyParser(&profile); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	db.Create(&profile)
+	return c.Status(201).JSON(profile)
+}
+
+func GetProfiles(c *fiber.Ctx) error {
+	db := database.DBConn
+	var profiles []m.Profile
+	db.Find(&profiles)
+	return c.Status(200).JSON(profiles)
+}
+
+func UpdateProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	var profile m.Profile
+	id := c.Params("id")
+	if err := c.BodyParser(&profile); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+	db.Where("id = ?", id).Updates(&profile)
+	return c.Status(200).JSON(profile)
+}
+
+func RemoveProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	id := c.Params("id")
+	var profile m.Profile
+	result := db.Delete(&profile, id)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
 	return c.SendStatus(200)
 }
