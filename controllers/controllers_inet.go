@@ -430,6 +430,62 @@ func GetProfiles(c *fiber.Ctx) error {
 	return c.Status(200).JSON(profiles)
 }
 
+func GetProfileSum(c *fiber.Ctx) error {
+	db := database.DBConn
+	var profile []m.Profile
+
+	db.Find(&profile)
+	gen_x := 0
+	gen_y := 0
+	gen_z := 0
+	gen_b := 0
+	gen_g := 0
+
+	var dataResults []m.ProfileRes
+	for _, v := range profile {
+		GenStr := ""
+		if v.Age < 24 {
+			GenStr = "Gen Z"
+			gen_z += 1
+		} else if v.Age >= 24 && v.Age <= 41 {
+			GenStr = "Gen Y"
+			gen_y += 1
+		} else if v.Age >= 42 && v.Age <= 56 {
+			GenStr = "Gen X"
+			gen_x += 1
+		} else if v.Age >= 57 && v.Age <= 75 {
+			GenStr = "Baby Boomer"
+			gen_b += 1
+		} else if v.Age > 75 {
+			GenStr = "G.I. Generation"
+			gen_g += 1
+		} else {
+			GenStr = "no gen"
+		}
+
+		d := m.ProfileRes{
+			FirstName:  v.FirstName,
+			EmployeeID: v.EmployeeID,
+			Age:        v.Age,
+			Gen:        GenStr,
+		}
+
+		dataResults = append(dataResults, d)
+	}
+
+	r := m.ResultGen{
+		Data:  dataResults,
+		Name:  "golang-test",
+		Count: len(profile),
+		GenX:  gen_x,
+		GenY:  gen_y,
+		GenZ:  gen_z,
+		GenB:  gen_b,
+		GenG:  gen_g,
+	}
+	return c.Status(200).JSON(r)
+}
+
 func UpdateProfile(c *fiber.Ctx) error {
 	db := database.DBConn
 	var profile m.Profile

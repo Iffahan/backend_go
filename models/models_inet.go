@@ -76,3 +76,27 @@ type Profile struct {
 	Email      string `json:"email,omitempty" validate:"required,email"`
 	Tel        string `json:"tel,omitempty" validate:"required,min=10,max=13"`
 }
+
+type ProfileRes struct {
+	FirstName  string `json:"fullname"`
+	EmployeeID int    `json:"employee_id"`
+	Age        int    `json:"age"`
+	Gen        string `json:"gen"`
+}
+
+type ResultProfile struct {
+	Data  []ProfileRes `json:"data"`
+	Name  string       `json:"name"`
+	Count int          `json:"count"`
+}
+
+type ResultGen struct {
+	Data  []ProfileRes `json:"data"`
+	Name  string       `json:"name"`
+	Count int          `json:"count"`
+	GenX  int          `json:"gen_x"`
+	GenY  int          `json:"gen_y"`
+	GenZ  int          `json:"gen_z"`
+	GenB  int          `json:"gen_b"`
+	GenG  int          `json:"gen_g"`
+}

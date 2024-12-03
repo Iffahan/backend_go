@@ -40,6 +40,7 @@ func InetRoutes(app *fiber.App) {
 	profile.Post("/", mw.BasicAuth(), c.AddProfile)
 	profile.Put("/:id", mw.BasicAuth(), c.UpdateProfile)
 	profile.Delete("/:id", mw.BasicAuth(), c.RemoveProfile)
+	profile.Get("/result", c.GetProfileSum)
 
 	//v1
 	v1.Get("/:name", mw.BasicAuth(), c.ParamsTest)
