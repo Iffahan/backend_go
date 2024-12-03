@@ -486,6 +486,36 @@ func GetProfileSum(c *fiber.Ctx) error {
 	return c.Status(200).JSON(r)
 }
 
+func SearchProfile(c *fiber.Ctx) error {
+	db := database.DBConn
+	search := c.Query("search")
+
+	if search == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Search query cannot be empty",
+		})
+	}
+
+	var profiles []m.Profile
+
+	if err := db.Where("employee_id LIKE ? OR first_name LIKE ? OR last_name LIKE ?",
+		"%"+search+"%", "%"+search+"%", "%"+search+"%").
+		Find(&profiles).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Error while searching profiles",
+			"error":   err.Error(),
+		})
+	}
+
+	if len(profiles) == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "No profiles found for the given search term",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(profiles)
+}
+
 func UpdateProfile(c *fiber.Ctx) error {
 	db := database.DBConn
 	var profile m.Profile
